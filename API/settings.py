@@ -20,12 +20,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'c2-e(*_k37f$k35j7%5r@p#fmxiia*dl&**jab#9$n=79w+u65'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['personal-252216.appspot.com']
 
 
 # Application definition
@@ -94,11 +94,19 @@ DATABASES = {
         'NAME': 'website-DB',
         'USER': 'django-agent',
         'PASSWORD': os.getenv('SecretP'),
-        'HOST': os.getenv('CloudSQL_Host'),
         'PORT': '5432'
     }
 }
 
+# In the flexible environment, you connect to CloudSQL using a unix socket.
+# Locally, you can use the CloudSQL proxy to proxy a localhost connection
+# to the instance
+DATABASES['default']['HOST'] = '/cloudsql/personal-252216:us-east1:site-instance'
+if os.getenv('GAE_INSTANCE'):
+    pass
+else:
+    DATABASES['default']['HOST'] = os.getenv('CloudSQL_Host')
+# [END dbconfig]
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -137,4 +145,4 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'API/static')
-STATIC_URL = '/static/'
+STATIC_URL = 'https://storage.googleapis.com/<your-gcs-bucket>/static/'
